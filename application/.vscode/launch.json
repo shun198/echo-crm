@@ -1,0 +1,15 @@
+{
+    // https://qiita.com/momotaro98/items/7fbcad57a9d8488fe999
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${fileDirname}",
+            "env": {},
+            "args": []
+        }
+    ]
+}

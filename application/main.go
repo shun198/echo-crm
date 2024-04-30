@@ -3,9 +3,10 @@ package main
 import (
 	"net/http"
 	// https://github.com/labstack/echo-contrib/issues/8
-	"github.com/labstack/echo/v4"
-	"github.com/swaggo/echo-swagger"
 	_ "go_crm/docs"
+
+	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 // @title Swagger Example API

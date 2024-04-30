@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 	// https://github.com/labstack/echo-contrib/issues/8
-	_ "go_crm/docs"
+	_ "github.com/shun198/go-crm/docs"
 
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"

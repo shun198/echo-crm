@@ -39,7 +39,7 @@ jobs:
         with:
           go-version: '1.20'
           cache: true
-          cache-dependency-path: go.sum
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/go.sum
       - name: Install dependencies
         run: go get -u
       - name: Build Go

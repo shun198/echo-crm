@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: containers/go/Dockerfile
     volumes:
-      - ./app:/usr/local/go/src/ats_system
+      - ./application:/usr/local/go/src/go_crm
     ports:
       - "8000:8000"
     command: air -d

@@ -1,0 +1,49 @@
+name: Tests
+on:
+  push:
+
+env:
+  WORKING_DIRECTORY: application
+  POSTGRES_NAME: test
+  POSTGRES_USER: test
+  POSTGRES_PASSWORD: test
+  POSTGRES_HOST: 127.0.0.1
+
+jobs:
+  test:
+    name: Run Test Code
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+    services:
+      db:
+        image: postgres:16.2
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_NAME: ${{ env.POSTGRES_NAME }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd "pg_isready"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      # https://github.com/actions/setup-go
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.20'
+          cache: true
+          cache-dependency-path: go.sum
+      - name: Install dependencies
+        run: go get -u
+      - name: Build Go
+        run: go build -v
+      - name: Run Test
+        run: go test -p 1 -v ./...
+

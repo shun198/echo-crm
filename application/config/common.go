@@ -4,7 +4,16 @@ import (
 	"errors"
 	"net/mail"
 	"time"
+
+	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
+
+// EchoとGormのポインタを格納
+type Env struct {
+	Echo *echo.Echo
+	DB   *gorm.DB
+}
 
 // パスワード再設定用トークンの有効期限
 const resetPasswordExpiry = time.Duration(30) * time.Minute

@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/shun198/go-crm/config"
 	_ "github.com/shun198/go-crm/docs"
 
 	// https://github.com/labstack/echo-contrib/issues/8
@@ -17,6 +18,12 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	_, err := config.StartDatabase()
+
+	if err != nil {
+		e.Logger.Fatal(err)
+		return
+	}
 	// https://github.com/swaggo/echo-swagger?tab=readme-ov-file
 	// https://medium.com/@chaewonkong/a-five-step-guide-to-integrating-swagger-with-echo-in-go-79be49cfedbe
 	e.GET("/swagger/*", echoSwagger.WrapHandler)

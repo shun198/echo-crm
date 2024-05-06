@@ -16,7 +16,7 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-type UrlData struct {
+type EmailData struct {
 	Url string
 }
 
@@ -119,12 +119,15 @@ func CreateEmail(e *echo.Echo, email string, url string, templateName string, su
 	plaintext, _ := template.New(fmt.Sprint(templateName, ".txt")).ParseFiles(fmt.Sprint(wd, "/templates/", templateName, ".txt"))
 
 	var tpl bytes.Buffer
-	if err := html.Execute(&tpl, UrlData{Url: url}); err != nil {
+	// urlをテンプレートに埋め込む
+	// Djangoのrender_to_stringと同じようなことをしている
+	if err := html.Execute(&tpl, EmailData{Url: url}); err != nil {
 		e.Logger.Error(err)
 		return err
 	}
 	htmlResult := tpl.String()
-	if err := plaintext.Execute(&tpl, UrlData{Url: url}); err != nil {
+	// urlをテンプレートに埋め込む
+	if err := plaintext.Execute(&tpl, EmailData{Url: url}); err != nil {
 		e.Logger.Error(err)
 		return err
 	}

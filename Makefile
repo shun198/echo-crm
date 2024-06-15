@@ -9,3 +9,6 @@ up:
 
 down:
 	docker-compose down
+
+seed:
+	docker-compose exec app go run seed/seed.go

@@ -15,4 +15,7 @@ func SetUserRoutes(e *echo.Echo, db *gorm.DB) {
 	e.GET("/api/admin/users", func(c echo.Context) error {
 		return controllers.GetUsers(c, db)
 	})
+	e.POST("/api/admin/users/:id/toggle_user_active", func(c echo.Context) error {
+		return controllers.ToggleUserActive(c, db)
+	})
 }

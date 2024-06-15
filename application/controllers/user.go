@@ -15,3 +15,13 @@ func GetUsers(c echo.Context, db *gorm.DB) error {
 	}
 	return c.JSON(http.StatusOK, users)
 }
+
+func ToggleUserActive(c echo.Context, db *gorm.DB) error {
+	id := c.Param("id")
+	user, err := services.GetUserByID(id, db)
+	if err != nil {
+		return c.JSON(http.StatusOK, map[string]string{"msg": "該当するユーザが存在しません"})
+	}
+	toggled_user := services.ToggleUserActive(user, db)
+	return c.JSON(http.StatusOK, map[string]bool{"disabled": toggled_user.Disabled})
+}

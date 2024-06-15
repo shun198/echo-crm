@@ -26,7 +26,7 @@ func ToggleUserActive(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusOK, map[string]string{"msg": "該当するユーザが存在しません"})
 	}
 	toggled_user := services.ToggleUserActive(user, db)
-	return c.JSON(http.StatusOK, map[string]bool{"disabled": toggled_user.Disabled})
+	return c.JSON(http.StatusOK, map[string]bool{"disabled": toggled_user.Active})
 }
 
 func SendInviteUserEmail(c echo.Context, db *gorm.DB) error {

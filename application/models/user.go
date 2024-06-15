@@ -11,9 +11,9 @@ type User struct {
 	Email          string `gorm:"uniqueIndex;not null;size:255" json:"email"`
 	Name           string `gorm:"not null;size:255" json:"name"`
 	Password       string `gorm:"not null;size:255" json:"-"`
-	Verified       bool   `gorm:"not null" json:"verified"`
+	Verified       bool   `gorm:"not null" json:"is_verified"`
 	Role           uint8  `gorm:"not null" json:"role"`
-	Disabled       bool   `gorm:"not null;default:false"`
+	Active         bool   `gorm:"not null" json:"is_active"`
 	// CreatedAt and UpdatedAt are special fields that GORM automatically populates with the current time when a record is created or updated
 	CreatedAt   time.Time `gorm:"- autoCreateTime" json:"-"`
 	UpdatedAt   time.Time `gorm:"- autoUpdateTime" json:"-"`

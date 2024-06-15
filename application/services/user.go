@@ -38,7 +38,7 @@ func GetUserByEmployeeNumber(employee_number string, db *gorm.DB) (models.User, 
 }
 
 func ToggleUserActive(user models.User, db *gorm.DB) models.User {
-	db.Update("Disabled", !user.Disabled)
+	db.Update("Disabled", !user.Active)
 	return user
 }
 

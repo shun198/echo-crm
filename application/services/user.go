@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/shun198/echo-crm/models"
+	"github.com/shun198/echo-crm/serializers"
 	"gorm.io/gorm"
 )
 
@@ -24,10 +25,16 @@ func GetUserByID(idParam string, db *gorm.DB) (models.User, error) {
 	return user, result.Error
 }
 
-func GetUserByEmployeeNumber(db *gorm.DB) (models.User, error) {
+func GetUserByEmployeeNumber(employee_number string, db *gorm.DB) (models.User, error) {
 	var user models.User
-	result := db.Find(&user)
-	return user, result.Error
+	result := db.Where("employee_number = ?", employee_number).First(&user)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return models.User{}, nil
+		}
+		return models.User{}, result.Error
+	}
+	return user, nil
 }
 
 func ToggleUserActive(user models.User, db *gorm.DB) models.User {
@@ -35,11 +42,16 @@ func ToggleUserActive(user models.User, db *gorm.DB) models.User {
 	return user
 }
 
+func CreateUser(data *serializers.SignUp, db *gorm.DB) models.User {
+	var user models.User
+	return user
+}
+
 func GetRoleNumber(role string) (uint8, error) {
 	switch role {
 	case "管理者":
 		return 1, nil
-	case "一般ユーザー":
+	case "一般":
 		return 2, nil
 	default:
 		return 99, errors.New("存在しないロールです")

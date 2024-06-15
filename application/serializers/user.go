@@ -51,7 +51,7 @@ type (
 	}
 
 	SignUp struct {
-		EmployeeNumber string `json:"employeeNumber" validate:"required"`
+		EmployeeNumber string `json:"employee_number" validate:"required"`
 		Name           string `json:"name" validate:"required"`
 		Role           string `json:"role" validate:"required"`
 		Email          string `json:"email" validate:"required"`

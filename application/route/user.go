@@ -4,19 +4,15 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/shun198/go-crm/config"
-	"github.com/shun198/go-crm/controller"
+	"github.com/shun198/echo-crm/controllers"
+	"gorm.io/gorm"
 )
 
-func SetUserRoutes(env *config.Env) {
-	uc := controller.UserController{Env: env}
-
-	env.Echo.GET("/api/health", func(c echo.Context) error {
+func SetUserRoutes(e *echo.Echo, db *gorm.DB) {
+	e.GET("/api/health", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"msg": "pass"})
 	})
-
-	env.Echo.GET("/api/user", func(c echo.Context) error {
-		users := uc.GetUsers()
-		return c.JSON(http.StatusOK, users)
+	e.GET("/api/admin/users", func(c echo.Context) error {
+		return controllers.GetUsers(c, db)
 	})
 }

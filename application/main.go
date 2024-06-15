@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/shun198/go-crm/config"
-	_ "github.com/shun198/go-crm/docs"
-	"github.com/shun198/go-crm/route"
+	"github.com/shun198/echo-crm/config"
+	_ "github.com/shun198/echo-crm/docs"
+	"github.com/shun198/echo-crm/route"
 
 	// https://github.com/labstack/echo-contrib/issues/8
 	"github.com/labstack/echo/v4"
@@ -24,8 +24,7 @@ func main() {
 		return
 	}
 
-	env := &config.Env{Echo: e, DB: db}
-	route.SetUserRoutes(env)
+	route.SetUserRoutes(e, db)
 	// https://github.com/swaggo/echo-swagger?tab=readme-ov-file
 	// https://medium.com/@chaewonkong/a-five-step-guide-to-integrating-swagger-with-echo-in-go-79be49cfedbe
 	e.GET("/swagger/*", echoSwagger.WrapHandler)

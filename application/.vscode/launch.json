@@ -2,14 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach to Server",
+            "name": "Remote",
             "type": "go",
             "request": "attach",
             "mode": "remote",
-            "remotePath": "/workspace",
-            "port": 8080,
+            "remotePath": "/usr/local/go/src/echo-crm",
+            "port": 2345,
             "host": "localhost",
-            "showLog": true
+            "cwd": "${workspaceRoot}",
         }
     ]
 }

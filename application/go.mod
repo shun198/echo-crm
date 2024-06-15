@@ -1,4 +1,4 @@
-module github.com/shun198/go-crm
+module github.com/shun198/echo-crm
 
 go 1.20
 

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/shun198/go-crm/model"
+	"github.com/shun198/echo-crm/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,9 +20,9 @@ func StartDatabase() (*gorm.DB, error) {
 
 func migrateDatabase(db *gorm.DB) error {
 	return db.AutoMigrate(
-		model.Invitation{},
-		model.ResetPassword{},
-		model.User{},
-		model.Session{},
+		models.Invitation{},
+		models.ResetPassword{},
+		models.User{},
+		models.Session{},
 	)
 }

@@ -6,18 +6,18 @@ import (
 	"io"
 	"time"
 
-	"github.com/shun198/go-crm/model"
+	"github.com/shun198/echo-crm/models"
 )
 
 // パスワード再設定用トークンを作るための関数
-func MakeResetPasswordToken(user *model.User) (*model.ResetPassword, error) {
+func MakeResetPasswordToken(user *models.User) (*models.ResetPassword, error) {
 	token, err := tokenGenerator(32)
 	if err != nil {
 		return nil, err
 	}
 
 	expiryTime := time.Now().Add(resetPasswordExpiry)
-	resetPassword := model.ResetPassword{
+	resetPassword := models.ResetPassword{
 		User:   *user,
 		UserID: user.ID,
 		Token:  token,
@@ -28,13 +28,13 @@ func MakeResetPasswordToken(user *model.User) (*model.ResetPassword, error) {
 }
 
 // 招待用トークンを作るための関数
-func MakeInvitationToken(user *model.User) (*model.Invitation, error) {
+func MakeInvitationToken(user *models.User) (*models.Invitation, error) {
 	token, err := tokenGenerator(32)
 	if err != nil {
 		return nil, err
 	}
 	expiryTime := time.Now().Add(userInviteExpiry)
-	invitation := model.Invitation{
+	invitation := models.Invitation{
 		User:   *user,
 		UserID: user.ID,
 		Token:  token,

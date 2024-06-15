@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: containers/go/Dockerfile
     volumes:
-      - ./application:/usr/local/go/src/go_crm
+      - ./application:/usr/local/go/src/echo-crm
     ports:
       - "8000:8000"
       # デバッグ用

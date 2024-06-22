@@ -46,7 +46,7 @@ func SendInviteUserEmail(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "登録済みのユーザです"})
 	}
 	services.CreateUser(data, db)
-	return c.JSON(http.StatusOK, map[string]string{"msg": "ユーザの作成に成功しました"})
+	return c.JSON(http.StatusOK, map[string]string{"msg": "ユーザの招待に成功しました"})
 }
 
 func ResendInvitation(c echo.Context, db *gorm.DB) error {

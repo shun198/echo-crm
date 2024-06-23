@@ -26,7 +26,7 @@ type (
 		Message        string `json:"msg,omitempty"`
 	}
 
-	ForgotPassword struct {
+	ResetPassword struct {
 		EmployeeNumber string `json:"employeeNumber" validate:"required"`
 	}
 

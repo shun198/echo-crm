@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -55,7 +54,7 @@ func SendInviteUserEmail(c echo.Context, db *gorm.DB) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "ユーザの作成に失敗しました"})
 	}
-	url := config.BaseDomain + "/sign-up/"
+	url := config.BaseDomain + "/register/"
 	emails.SendEmail("ようこそ！", created_user.Email, url, "welcomeEmail")
 	return c.JSON(http.StatusOK, map[string]string{"msg": "ユーザの招待に成功しました"})
 }
@@ -66,6 +65,21 @@ func ResendInvitation(c echo.Context, db *gorm.DB) error {
 	if err != nil {
 		return c.JSON(http.StatusOK, map[string]string{"msg": "該当するユーザが存在しません"})
 	}
-	fmt.Print(user)
+	url := config.BaseDomain + "/register/"
+	emails.SendEmail("ようこそ！", user.Email, url, "welcomeEmail")
+	return c.JSON(http.StatusOK, map[string]string{})
+}
+
+func SendResetPasswordEmail(c echo.Context, db *gorm.DB) error {
+	data := new(serializers.ResetPassword)
+	if err := c.Bind(data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, serializers.ErrorResponse{Message: err.Error()})
+	}
+	user := services.GetUserByEmployeeNumber(data.EmployeeNumber, db)
+	if (user == models.User{}) {
+		return c.JSON(http.StatusBadRequest, map[string]string{})
+	}
+	url := config.BaseDomain + "/reset-password/"
+	emails.SendEmail("パスワード再設定", user.Email, url, "resetPassword")
 	return c.JSON(http.StatusOK, map[string]string{})
 }

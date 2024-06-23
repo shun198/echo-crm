@@ -44,7 +44,7 @@ func SetUserRoutes(e *echo.Echo, db *gorm.DB) {
 		return controllers.ResendInvitation(c, db)
 	})
 	e.POST("/api/admin/users/send_reset_password_email", func(c echo.Context) error {
-		return controllers.ResendInvitation(c, db)
+		return controllers.SendResetPasswordEmail(c, db)
 	})
 	e.POST("/api/admin/users/reset_password", func(c echo.Context) error {
 		return controllers.ResendInvitation(c, db)

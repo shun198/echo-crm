@@ -54,7 +54,11 @@ func SendInviteUserEmail(c echo.Context, db *gorm.DB) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "ユーザの作成に失敗しました"})
 	}
-	url := config.BaseDomain + "/register/"
+	invitationToken, err := config.MakeInvitationToken(&created_user)
+	if err != nil {
+		return err
+	}
+	url := config.BaseDomain + "/register/" + invitationToken.Token
 	emails.SendEmail("ようこそ！", created_user.Email, url, "welcomeEmail")
 	return c.JSON(http.StatusOK, map[string]string{"msg": "ユーザの招待に成功しました"})
 }
@@ -79,7 +83,11 @@ func SendResetPasswordEmail(c echo.Context, db *gorm.DB) error {
 	if (user == models.User{}) {
 		return c.JSON(http.StatusBadRequest, map[string]string{})
 	}
-	url := config.BaseDomain + "/reset-password/"
+	resetPasswordToken, err := config.MakeResetPasswordToken(&user)
+	if err != nil {
+		return err
+	}
+	url := config.BaseDomain + "/reset-password/" + resetPasswordToken.Token
 	emails.SendEmail("パスワード再設定", user.Email, url, "resetPassword")
 	return c.JSON(http.StatusOK, map[string]string{})
 }

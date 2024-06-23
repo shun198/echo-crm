@@ -28,10 +28,11 @@ func SetUserRoutes(e *echo.Echo, db *gorm.DB) {
 		return controllers.GetUsers(c, db, *currentUser)
 	})
 	e.POST("/api/admin/users/:id/toggle_user_active", func(c echo.Context) error {
-		return controllers.ToggleUserActive(c, db)
+		currentUser := config.GetUserFromCookie(c, db)
+		return controllers.ToggleUserActive(c, db, *currentUser)
 	})
 	e.PATCH("/api/admin/users/:id/change_user_details", func(c echo.Context) error {
-		return controllers.ToggleUserActive(c, db)
+		return controllers.ChangeUserDetails(c, db)
 	})
 	e.POST("/api/admin/users/send_invite_user_email", func(c echo.Context) error {
 		return controllers.SendInviteUserEmail(c, db)
@@ -43,7 +44,8 @@ func SetUserRoutes(e *echo.Echo, db *gorm.DB) {
 		return controllers.ResendInvitation(c, db)
 	})
 	e.POST("/api/admin/users/change_password", func(c echo.Context) error {
-		return controllers.ChangePassword(c, db)
+		currentUser := config.GetUserFromCookie(c, db)
+		return controllers.ChangePassword(c, db, *currentUser)
 	})
 	e.POST("/api/admin/users/send_reset_password_email", func(c echo.Context) error {
 		return controllers.SendResetPasswordEmail(c, db)

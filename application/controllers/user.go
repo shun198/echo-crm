@@ -27,11 +27,14 @@ func GetUsers(c echo.Context, db *gorm.DB, currentUser models.User) error {
 	return c.JSON(http.StatusOK, users)
 }
 
-func ToggleUserActive(c echo.Context, db *gorm.DB) error {
+func ToggleUserActive(c echo.Context, db *gorm.DB, currentUser models.User) error {
 	id := c.Param("id")
 	user, err := services.GetUserByID(id, db)
 	if err != nil {
 		return c.JSON(http.StatusOK, map[string]string{"msg": "該当するユーザが存在しません"})
+	}
+	if user == currentUser {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "自身を無効化できません"})
 	}
 	toggled_user := services.ToggleUserActive(user, db)
 	return c.JSON(http.StatusOK, map[string]bool{"is_active": toggled_user.IsActive})
@@ -118,7 +121,7 @@ func ResendInvitation(c echo.Context, db *gorm.DB) error {
 	return c.JSON(http.StatusOK, map[string]string{})
 }
 
-func ChangePassword(c echo.Context, db *gorm.DB) error {
+func ChangePassword(c echo.Context, db *gorm.DB, currentUser models.User) error {
 	data := new(serializers.UpdateUserPassword)
 	if err := c.Bind(data); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, serializers.ErrorResponse{Message: err.Error()})
@@ -126,6 +129,12 @@ func ChangePassword(c echo.Context, db *gorm.DB) error {
 	if data.NewPassword != data.ConfirmPassword {
 		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "パスワードと確認用パスワードが一致しません"})
 	}
+	hashed_password, err := config.HashPassword(data.NewPassword)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "パスワードのハッシュ化に失敗しました"})
+	}
+	currentUser.Password = hashed_password
+	db.Save(&currentUser)
 	return c.JSON(http.StatusOK, map[string]string{})
 }
 

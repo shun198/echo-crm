@@ -1,8 +1,9 @@
 package main
 
 import (
-	// "net/http"
-	// "os"
+	"net/http"
+	"os"
+	"strings"
 
 	"github.com/shun198/echo-crm/config"
 	_ "github.com/shun198/echo-crm/docs"
@@ -20,27 +21,36 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     strings.Split(os.Getenv("CORS_HEADERS"), " "),
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, "X-XSRF-TOKEN", "X-ALB-AUTH"},
+		AllowCredentials: true,
+		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete, http.MethodOptions},
+	}))
+
+	e.Use(middleware.Recover())
+
 	db, err := config.StartDatabase()
 
 	if err != nil {
 		e.Logger.Fatal(err)
 		return
 	}
-	// cookieSameSite := http.SameSiteStrictMode
-	// if os.Getenv("DEBUG") == "" {
-	// 	cookieSameSite = http.SameSiteNoneMode
-	// }
+	cookieSameSite := http.SameSiteStrictMode
+	if os.Getenv("DEBUG") == "" {
+		cookieSameSite = http.SameSiteNoneMode
+	}
 
-	// e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-	// 	TokenLookup:    "header:XSRF-TOKEN",
-	// 	CookieDomain:   os.Getenv("COOKIE_DOMAIN"),
-	// 	CookieName:     "csrfcookie",
-	// 	CookiePath:     "/",
-	// 	CookieMaxAge:   86400,
-	// 	CookieSecure:   os.Getenv("DEBUG") == "",
-	// 	CookieHTTPOnly: false,
-	// 	CookieSameSite: cookieSameSite,
-	// }))
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		TokenLookup:    "header:XSRF-TOKEN",
+		CookieDomain:   os.Getenv("COOKIE_DOMAIN"),
+		CookieName:     "csrfcookie",
+		CookiePath:     "/",
+		CookieMaxAge:   86400,
+		CookieSecure:   os.Getenv("DEBUG") == "",
+		CookieHTTPOnly: false,
+		CookieSameSite: cookieSameSite,
+	}))
 	route.SetUserRoutes(e, db)
 	// https://github.com/swaggo/echo-swagger?tab=readme-ov-file
 	// https://medium.com/@chaewonkong/a-five-step-guide-to-integrating-swagger-with-echo-in-go-79be49cfedbe

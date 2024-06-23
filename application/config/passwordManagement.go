@@ -34,6 +34,5 @@ func ValidatePassword(password string) error {
 	} else if passwordLength > 64 {
 		return errors.New("64文字以下のパスワードを入力してください")
 	}
-
 	return nil
 }

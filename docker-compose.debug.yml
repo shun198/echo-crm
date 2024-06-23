@@ -40,7 +40,7 @@ services:
     networks:
       - proxynet
   mail:
-    container_name: mail_debug
+    container_name: mail
     image: schickling/mailcatcher
     ports:
       - '1080:1080'

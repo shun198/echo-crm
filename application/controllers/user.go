@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/shun198/echo-crm/config"
+	"github.com/shun198/echo-crm/emails"
 	"github.com/shun198/echo-crm/models"
 	"github.com/shun198/echo-crm/serializers"
 	"github.com/shun198/echo-crm/services"
@@ -26,7 +28,7 @@ func ToggleUserActive(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusOK, map[string]string{"msg": "該当するユーザが存在しません"})
 	}
 	toggled_user := services.ToggleUserActive(user, db)
-	return c.JSON(http.StatusOK, map[string]bool{"disabled": toggled_user.Active})
+	return c.JSON(http.StatusOK, map[string]bool{"disabled": toggled_user.IsActive})
 }
 
 func SendInviteUserEmail(c echo.Context, db *gorm.DB) error {
@@ -37,15 +39,24 @@ func SendInviteUserEmail(c echo.Context, db *gorm.DB) error {
 	// if err := c.Validate(data); err != nil {
 	// 	return c.JSON(http.StatusBadRequest, serializers.ErrorResponse{Message: err.Error()})
 	// }
-	_, err := services.GetRoleNumber(data.Role)
+	role, err := services.GetRoleNumber(data.Role)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "存在しないロールです"})
 	}
-	user, _ := services.GetUserByEmployeeNumber(data.EmployeeNumber, db)
-	if (user == models.User{}) {
+	user := services.GetUserByEmployeeNumber(data.EmployeeNumber, db)
+	if (user != models.User{}) {
 		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "登録済みのユーザです"})
 	}
-	services.CreateUser(data, db)
+	user = services.GetUserByEmail(data.Email, db)
+	if (user != models.User{}) {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "登録済みのユーザです"})
+	}
+	created_user, err := services.CreateUser(data, role, db)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "ユーザの作成に失敗しました"})
+	}
+	url := config.BaseDomain + "/sign-up/"
+	emails.SendEmail("ようこそ！", created_user.Email, url, "welcomeEmail")
 	return c.JSON(http.StatusOK, map[string]string{"msg": "ユーザの招待に成功しました"})
 }
 

@@ -25,26 +25,33 @@ func GetUserByID(idParam string, db *gorm.DB) (models.User, error) {
 	return user, result.Error
 }
 
-func GetUserByEmployeeNumber(employee_number string, db *gorm.DB) (models.User, error) {
+func GetUserByEmployeeNumber(employee_number string, db *gorm.DB) models.User {
 	var user models.User
 	result := db.Where("employee_number = ?", employee_number).First(&user)
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			return models.User{}, nil
-		}
-		return models.User{}, result.Error
+	if result.Error == gorm.ErrRecordNotFound {
+		return models.User{}
 	}
-	return user, nil
+	return user
+}
+
+func GetUserByEmail(email string, db *gorm.DB) models.User {
+	var user models.User
+	result := db.Where("email = ?", email).First(&user)
+	if result.Error == gorm.ErrRecordNotFound {
+		return models.User{}
+	}
+	return user
 }
 
 func ToggleUserActive(user models.User, db *gorm.DB) models.User {
-	db.Update("Disabled", !user.Active)
+	db.Update("Disabled", !user.IsActive)
 	return user
 }
 
-func CreateUser(data *serializers.SignUp, db *gorm.DB) models.User {
-	var user models.User
-	return user
+func CreateUser(data *serializers.SignUp, role uint8, db *gorm.DB) (models.User, error) {
+	user := models.User{Name: data.Name, Email: data.Email, EmployeeNumber: data.EmployeeNumber, Role: role}
+	result := db.Create(&user)
+	return user, result.Error
 }
 
 func GetRoleNumber(role string) (uint8, error) {

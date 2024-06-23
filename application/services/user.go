@@ -44,7 +44,14 @@ func GetUserByEmail(email string, db *gorm.DB) models.User {
 }
 
 func ToggleUserActive(user models.User, db *gorm.DB) models.User {
+	user.IsActive = !user.IsActive
+	db.Save(&user)
+	return user
+}
+
+func ChangeUserDetails(user models.User, db *gorm.DB) models.User {
 	db.Update("Disabled", !user.IsActive)
+	db.Save(&user)
 	return user
 }
 

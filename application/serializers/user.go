@@ -56,4 +56,8 @@ type (
 		Role           string `json:"role" validate:"required"`
 		Email          string `json:"email" validate:"required"`
 	}
+
+	CheckToken struct {
+		Token string `json:"token"`
+	}
 )

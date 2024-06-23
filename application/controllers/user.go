@@ -91,3 +91,21 @@ func SendResetPasswordEmail(c echo.Context, db *gorm.DB) error {
 	emails.SendEmail("パスワード再設定", user.Email, url, "resetPassword")
 	return c.JSON(http.StatusOK, map[string]string{})
 }
+
+func CheckInvitationToken(c echo.Context, db *gorm.DB) error {
+	data := new(serializers.CheckToken)
+	if err := c.Bind(data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, serializers.ErrorResponse{Message: err.Error()})
+	}
+	check := services.CheckInvitationToken(data.Token, db)
+	return c.JSON(http.StatusOK, map[string]bool{"check": check})
+}
+
+func CheckResetPasswordToken(c echo.Context, db *gorm.DB) error {
+	data := new(serializers.CheckToken)
+	if err := c.Bind(data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, serializers.ErrorResponse{Message: err.Error()})
+	}
+	check := services.CheckResetPasswordToken(data.Token, db)
+	return c.JSON(http.StatusOK, map[string]bool{"check": check})
+}

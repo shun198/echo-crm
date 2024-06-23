@@ -50,9 +50,9 @@ func SetUserRoutes(e *echo.Echo, db *gorm.DB) {
 		return controllers.ResendInvitation(c, db)
 	})
 	e.POST("/api/admin/users/check_invitation_token", func(c echo.Context) error {
-		return controllers.ResendInvitation(c, db)
+		return controllers.CheckInvitationToken(c, db)
 	})
 	e.POST("/api/admin/users/check_reset_password_token", func(c echo.Context) error {
-		return controllers.ResendInvitation(c, db)
+		return controllers.CheckResetPasswordToken(c, db)
 	})
 }

@@ -54,9 +54,9 @@ func SendInviteUserEmail(c echo.Context, db *gorm.DB) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "ユーザの作成に失敗しました"})
 	}
-	invitationToken, err := config.MakeInvitationToken(&created_user)
+	invitationToken, err := config.MakeInvitationToken(&created_user, db)
 	if err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "招待用トークンの生成に失敗しました"})
 	}
 	url := config.BaseDomain + "/register/" + invitationToken.Token
 	emails.SendEmail("ようこそ！", created_user.Email, url, "welcomeEmail")
@@ -75,7 +75,7 @@ func ResendInvitation(c echo.Context, db *gorm.DB) error {
 }
 
 func SendResetPasswordEmail(c echo.Context, db *gorm.DB) error {
-	data := new(serializers.ResetPassword)
+	data := new(serializers.SendResetPasswordEmail)
 	if err := c.Bind(data); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, serializers.ErrorResponse{Message: err.Error()})
 	}
@@ -83,12 +83,58 @@ func SendResetPasswordEmail(c echo.Context, db *gorm.DB) error {
 	if (user == models.User{}) {
 		return c.JSON(http.StatusBadRequest, map[string]string{})
 	}
-	resetPasswordToken, err := config.MakeResetPasswordToken(&user)
+	resetPasswordToken, err := config.MakeResetPasswordToken(&user, db)
 	if err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, map[string]string{})
 	}
 	url := config.BaseDomain + "/reset-password/" + resetPasswordToken.Token
 	emails.SendEmail("パスワード再設定", user.Email, url, "resetPassword")
+	return c.JSON(http.StatusOK, map[string]string{})
+}
+
+func VerifyUser(c echo.Context, db *gorm.DB) error {
+	data := new(serializers.ConfirmPassword)
+	if err := c.Bind(data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, serializers.ErrorResponse{Message: err.Error()})
+	}
+	check := services.CheckInvitationToken(data.Token, db)
+	if !check {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "無効なトークンです"})
+	}
+	if data.NewPassword != data.ConfirmPassword {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "パスワードと確認用パスワードが一致しません"})
+	}
+	user := services.GetUserByInvitationToken(data.Token, db)
+	newPassword, err := config.HashPassword(data.NewPassword)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "パスワードのハッシュ化に失敗しました"})
+	}
+	user.IsActive = true
+	user.IsVerified = true
+	user.Password = newPassword
+	db.Save(&user)
+	return c.JSON(http.StatusOK, map[string]string{})
+}
+
+func RestPassword(c echo.Context, db *gorm.DB) error {
+	data := new(serializers.ConfirmPassword)
+	if err := c.Bind(data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, serializers.ErrorResponse{Message: err.Error()})
+	}
+	check := services.CheckResetPasswordToken(data.Token, db)
+	if !check {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "無効なトークンです"})
+	}
+	if data.NewPassword != data.ConfirmPassword {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "パスワードと確認用パスワードが一致しません"})
+	}
+	user := services.GetUserByPasswordResetToken(data.Token, db)
+	newPassword, err := config.HashPassword(data.NewPassword)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"msg": "パスワードのハッシュ化に失敗しました"})
+	}
+	user.Password = newPassword
+	db.Save(&user)
 	return c.JSON(http.StatusOK, map[string]string{})
 }
 

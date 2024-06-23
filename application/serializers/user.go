@@ -11,7 +11,7 @@ type (
 	UpdateUserPassword struct {
 		CurrentPassword string `json:"currentPassword" validate:"required,min=1"`
 		NewPassword     string `json:"newPassword" validate:"required,min=1,max=64"`
-		ConfirmPassword string `json:"confirmPassword" validate:"required,min=1"`
+		ConfirmPassword string `json:"confirmPassword" validate:"required,min=1,max=64"`
 	}
 
 	LoginCredentials struct {
@@ -26,13 +26,14 @@ type (
 		Message        string `json:"msg,omitempty"`
 	}
 
-	ResetPassword struct {
+	SendResetPasswordEmail struct {
 		EmployeeNumber string `json:"employeeNumber" validate:"required"`
 	}
 
 	ConfirmPassword struct {
-		Password        string `json:"password" validate:"required,max=64"`
-		ConfirmPassword string `json:"confirmPassword" validate:"required"`
+		Token           string `json:"token"`
+		NewPassword     string `json:"newPassword" validate:"required,max=64"`
+		ConfirmPassword string `json:"confirmPassword" validate:"required,max=64"`
 	}
 
 	ChangeUserDetails struct {

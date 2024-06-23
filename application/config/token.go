@@ -7,10 +7,11 @@ import (
 	"time"
 
 	"github.com/shun198/echo-crm/models"
+	"gorm.io/gorm"
 )
 
 // パスワード再設定用トークンを作るための関数
-func MakeResetPasswordToken(user *models.User) (*models.ResetPassword, error) {
+func MakeResetPasswordToken(user *models.User, db *gorm.DB) (*models.ResetPassword, error) {
 	token, err := tokenGenerator(32)
 	if err != nil {
 		return nil, err
@@ -24,11 +25,12 @@ func MakeResetPasswordToken(user *models.User) (*models.ResetPassword, error) {
 		Expiry: expiryTime,
 		Used:   false,
 	}
-	return &resetPassword, nil
+	result := db.Create(&resetPassword)
+	return &resetPassword, result.Error
 }
 
 // 招待用トークンを作るための関数
-func MakeInvitationToken(user *models.User) (*models.Invitation, error) {
+func MakeInvitationToken(user *models.User, db *gorm.DB) (*models.Invitation, error) {
 	token, err := tokenGenerator(32)
 	if err != nil {
 		return nil, err
@@ -41,7 +43,8 @@ func MakeInvitationToken(user *models.User) (*models.Invitation, error) {
 		Expiry: expiryTime,
 		Used:   false,
 	}
-	return &invitation, nil
+	result := db.Create(&invitation)
+	return &invitation, result.Error
 }
 
 func RandomPassword() (string, error) {

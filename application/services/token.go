@@ -32,3 +32,15 @@ func CheckResetPasswordToken(token string, db *gorm.DB) bool {
 	}
 	return true
 }
+
+func GetUserByInvitationToken(token string, db *gorm.DB) models.User {
+	var user models.User
+	db.Preload("User").Where("token = ?", token)
+	return user
+}
+
+func GetUserByPasswordResetToken(token string, db *gorm.DB) models.User {
+	var user models.User
+	db.Preload("User").Where("token = ?", token)
+	return user
+}

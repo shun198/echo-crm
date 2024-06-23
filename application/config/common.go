@@ -47,3 +47,12 @@ func setCookieName() string {
 		return "SID"
 	}
 }
+
+func Contains[K comparable](a K, list []K) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}

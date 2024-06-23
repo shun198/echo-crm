@@ -1,13 +1,6 @@
 package serializers
 
 type (
-	UserProfile struct {
-		EmployeeNumber string `json:"employeeNumber"`
-		Email          string `json:"email"`
-		Name           string `json:"name"`
-		Role           string `json:"role"`
-	}
-
 	UpdateUserPassword struct {
 		CurrentPassword string `json:"currentPassword" validate:"required,min=1"`
 		NewPassword     string `json:"newPassword" validate:"required,min=1,max=64"`
@@ -15,8 +8,8 @@ type (
 	}
 
 	LoginCredentials struct {
-		Username string `json:"username" validate:"required"`
-		Password string `json:"password" validate:"required"`
+		EmployeeNumber string `json:"employee_number" validate:"required"`
+		Password       string `json:"password" validate:"required"`
 	}
 
 	UserInfo struct {

@@ -1,36 +1,37 @@
 package services
 
 import (
+	"errors"
 	"time"
 
 	"github.com/shun198/echo-crm/models"
 	"gorm.io/gorm"
 )
 
-func CheckInvitationToken(token string, db *gorm.DB) bool {
-	var invitation *models.Invitation
+func CheckInvitationToken(token string, db *gorm.DB) (models.Invitation, error) {
+	var invitation models.Invitation
 	result := db.Preload("User").Where("token = ?", token).Take(&invitation)
 	if result.Error != nil {
-		return false
+		return models.Invitation{}, errors.New("存在しないトークンです")
 	}
 
 	if time.Now().After(invitation.Expiry) || invitation.Used {
-		return false
+		return models.Invitation{}, errors.New("有効期限切れのトークンです")
 	}
-	return true
+	return invitation, nil
 }
 
-func CheckResetPasswordToken(token string, db *gorm.DB) bool {
-	var reset_password *models.ResetPassword
+func CheckResetPasswordToken(token string, db *gorm.DB) (models.ResetPassword, error) {
+	var reset_password models.ResetPassword
 	result := db.Preload("User").Where("token = ?", token).Take(&reset_password)
 	if result.Error != nil {
-		return false
+		return models.ResetPassword{}, errors.New("存在しないトークンです")
 	}
 
 	if time.Now().After(reset_password.Expiry) || reset_password.Used {
-		return false
+		return models.ResetPassword{}, errors.New("有効期限切れのトークンです")
 	}
-	return true
+	return reset_password, nil
 }
 
 func GetUserByInvitationToken(token string, db *gorm.DB) models.User {

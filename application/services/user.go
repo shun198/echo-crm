@@ -15,6 +15,12 @@ func GetAllUsers(db *gorm.DB) ([]models.User, error) {
 	return users, result.Error
 }
 
+func GetAllUsersExpectSuperuser(db *gorm.DB) ([]models.User, error) {
+	var users []models.User
+	result := db.Not("role = 0").Find(&users)
+	return users, result.Error
+}
+
 func GetUserByID(idParam string, db *gorm.DB) (models.User, error) {
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -49,7 +55,7 @@ func ToggleUserActive(user models.User, db *gorm.DB) models.User {
 	return user
 }
 
-func ChangeUserDetails(user models.User, db *gorm.DB) models.User {
+func ChangeUserDetails(user models.User, data *serializers.ChangeUserDetails, db *gorm.DB) models.User {
 	db.Update("Disabled", !user.IsActive)
 	db.Save(&user)
 	return user
